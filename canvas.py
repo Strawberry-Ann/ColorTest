@@ -1,6 +1,6 @@
 from PIL import Image
 from PyQt5 import uic  # Импортируем uic
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QInputDialog
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 import sys
@@ -15,14 +15,24 @@ class MyWidget(QMainWindow):
         uic.loadUi('design.ui', self)  # Загружаем дизайн
         # Обратите внимание: имя элемента такое же как в QTDesigner
         self.x = 4
-        self.name = 1
+        self.name = 3
         self.initUI()
         self.copy_files()
-        self.run_picture()
         self.color = (255, 255, 255)
 
     def initUI(self):
         self.bg.buttonClicked.connect(self.check_color)
+        self.widget.hide()
+        self.pb_start = QPushButton(self)
+        self.pb_start.move(100, 0)
+        self.pb_start.setMinimumSize(200, 800)
+        self.pb_start.setText("Начать подборку цветов")
+        self.pb_start.clicked.connect(self.run_picture)
+        self.teory = QPushButton(self)
+        self.teory.move(300, 0)
+        self.teory.setMinimumSize(200, 800)
+        self.teory.setText("Start teory")
+        self.teory.clicked.connect(self.run_teory)
 
     def copy_files(self):
         lst_of_files_in_user = os.listdir(path="user")
@@ -33,7 +43,18 @@ class MyWidget(QMainWindow):
             shutil.copyfile(f'data/{file}', f'user/{file}')
 
     def run_picture(self):
+        self.pb_start.hide()
+        self.teory.hide()
+        self.name, ok_pressed = QInputDialog.getItem(
+            self, "Выберите комнату", "С какой комнаты начнём подборку цветов?",
+            ("Гостиная", "Ванная комната", "Спальня", "Кухня"), 0, False)
+        self.widget.show()
         self.look_picture(self.name)
+
+    def run_teory(self):
+        self.pb_start.hide()
+        self.teory.hide()
+        self.widget.show()
 
     def check_color(self, btn):
         color = btn.palette().button().color()
@@ -44,7 +65,7 @@ class MyWidget(QMainWindow):
 
     def mousePressEvent(self, event):
         self.coords = event.x() - 9, event.y() - 9
-        if 763 >= event.x() >= 9 and 541 >= event.y() >= 9:
+        if 772 >= event.x() >= 9 and 550 >= event.y() >= 9:
             self.im = Image.open(f'user/{self.name}.bmp')
             self.pixels = self.im.load()  # список с пикселями
             self.x, self.y = self.im.size  # ширина (x) и высота (y) изображения
