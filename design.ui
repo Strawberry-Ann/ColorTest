@@ -478,8 +478,8 @@
       <widget class="QWidget" name="gridLayoutWidget">
        <property name="geometry">
         <rect>
-         <x>120</x>
-         <y>620</y>
+         <x>140</x>
+         <y>580</y>
          <width>482</width>
          <height>120</height>
         </rect>
@@ -16771,6 +16771,39 @@
        <property name="text">
         <string>TextLabel</string>
        </property>
+      </widget>
+      <widget class="QWidget" name="horizontalLayoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>700</y>
+         <width>781</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QPushButton" name="pb_to_begin">
+          <property name="text">
+           <string>Начать сначала</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pb_check_picture">
+          <property name="text">
+           <string>Перейти к другой картинке</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pb_end_fill">
+          <property name="text">
+           <string>Завершить</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
