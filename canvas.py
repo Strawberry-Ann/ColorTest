@@ -5,9 +5,11 @@ from PyQt5.QtWidgets import QMessageBox, QInputDialog, QButtonGroup
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 import sys
-from PIL import Image
+from PIL import Image, ImageDraw
 import os
 import shutil
+import pygame
+from color import MyColor
 
 
 class MyWidget(QMainWindow):
@@ -20,6 +22,7 @@ class MyWidget(QMainWindow):
         self.initUI()
         self.copy_files()
         self.color = (255, 255, 255)
+        self.paint = False
 
     def initUI(self):
         self.bg.buttonClicked.connect(self.check_color)
@@ -41,12 +44,14 @@ class MyWidget(QMainWindow):
         self.results.move(500, 0)
         self.results.setMinimumSize(200, 800)
         self.results.setText("Get Result")
-        self.results.clicked.connect(self.run_teory)
+
         # группа кнопок меню
         self.group_buts_menu = QButtonGroup(self)
         self.group_buts_menu.addButton(self.pb_start)
         self.group_buts_menu.addButton(self.teory)
         self.group_buts_menu.addButton(self.results)
+        self.results.clicked.connect(self.run_results)
+
         # кнопки на виджете
         self.pb_to_begin.clicked.connect(self.to_begin)
         self.pb_end_fill.clicked.connect(self.end_fill)
@@ -67,7 +72,6 @@ class MyWidget(QMainWindow):
             button.hide()
         self.check_picture()
         self.widget.show()
-
 
     def check_picture(self):
         self.name, ok_pressed = QInputDialog.getItem(
@@ -98,29 +102,37 @@ class MyWidget(QMainWindow):
             button.show()
 
     def end_fill(self):
+        self.paint = False
         self.show_menu()
         self.run_results()
 
     def run_results(self):
-        self.analize_pictures()
+        # !!!!!!!!!!!!!!!!!!!!!!!#
+        for button in self.group_buts_menu.buttons():
+            button.hide()
+        colors = self.analize_pictures()
+        for color in colors:
+            pass
+        self.show_menu()
 
     def analize_pictures(self):
         colors = list()
         lst_of_files_in_user = os.listdir(path="user")
         for name in lst_of_files_in_user:
             im = Image.open(f'user/{name}')
+            im = im.convert('HSV')
             pixels = im.load()
             x, y = im.size
             dct = dict()
             for i in range(x):
                 for j in range(y):
-                    c =  pixels[i, j]
+                    c = pixels[i, j]
                     if c not in dct.keys():
                         dct[c] = 1
                     else:
                         dct[c] +=1
             cs = sorted(dct.keys(), key=lambda k: -dct[k])
-            colors.append((name[:-4], cs[0]))
+            colors.append((name[:-4], MyColor(cs[0][0], cs[0][1], cs[0][2])))
         return colors
 
     def check_color(self, btn):
@@ -134,7 +146,7 @@ class MyWidget(QMainWindow):
     def mousePressEvent(self, event):
         # функция нажатия кнопки мыши
         self.coords = event.x() - 9, event.y() - 9
-        if 772 >= event.x() >= 9 and 550 >= event.y() >= 9:
+        if 772 >= event.x() >= 9 and 550 >= event.y() >= 9 and self.paint:
             # заливаем область на картинке с помощью функции self.fill
             # здесь используется библиотека для работы с изображениями PIL
             self.im = Image.open(f'user/{self.name}.bmp')
@@ -145,6 +157,7 @@ class MyWidget(QMainWindow):
             self.look_picture(self.name)
 
     def look_picture(self, name):
+        self.paint = True
         self.pic = QPixmap(f'user/{name}.bmp')
         self.label.setPixmap(self.pic)
 
