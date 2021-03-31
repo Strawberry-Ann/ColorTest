@@ -8,8 +8,8 @@ import sys
 from PIL import Image, ImageDraw
 import os
 import shutil
-import pygame
 from color import MyColor
+import numpy as np
 
 
 class MyWidget(QMainWindow):
@@ -68,12 +68,14 @@ class MyWidget(QMainWindow):
             shutil.copyfile(f'data/{file}', f'user/{file}')
 
     def run_picture(self):
+        # функция показа окна заливки изображения
         for button in self.group_buts_menu.buttons():
             button.hide()
         self.check_picture()
         self.widget.show()
 
     def check_picture(self):
+        # сменить картинку для закрашивания
         self.name, ok_pressed = QInputDialog.getItem(
             self, "Выберите комнату", "С какой комнаты начнём подборку цветов?",
             ("Ванная комната", "Гостиная", "Кухня", "Спальня"), 0, False)
@@ -97,11 +99,13 @@ class MyWidget(QMainWindow):
             self.look_picture(self.name)
 
     def show_menu(self):
+        # перейти в меню
         self.widget.hide()
         for button in self.group_buts_menu.buttons():
             button.show()
 
     def end_fill(self):
+        # функция окончания заливки и показа результатов
         self.paint = False
         self.show_menu()
         self.run_results()
@@ -111,8 +115,18 @@ class MyWidget(QMainWindow):
         for button in self.group_buts_menu.buttons():
             button.hide()
         colors = self.analize_pictures()
-        for color in colors:
-            pass
+        for name, color in colors:
+            print(name)
+            im = Image.new("RGB", (500, 600), (9, 27, 96))
+            width, height = im.width, im.height
+            combo = color.get_comb()
+            print(combo)
+            draw = ImageDraw.Draw(im)
+            for i in range(len(combo)):
+                for j in range(len(combo[i])):
+                    color_my = combo[i][j]
+                    draw.rectangle(((100 * j, 100 * i), (100, 100)), color_my)
+            im.save(f'results/{name}.bmp')
         self.show_menu()
 
     def analize_pictures(self):
@@ -120,7 +134,6 @@ class MyWidget(QMainWindow):
         lst_of_files_in_user = os.listdir(path="user")
         for name in lst_of_files_in_user:
             im = Image.open(f'user/{name}')
-            im = im.convert('HSV')
             pixels = im.load()
             x, y = im.size
             dct = dict()
@@ -157,6 +170,7 @@ class MyWidget(QMainWindow):
             self.look_picture(self.name)
 
     def look_picture(self, name):
+        # функция помещения картинки на QLabel
         self.paint = True
         self.pic = QPixmap(f'user/{name}.bmp')
         self.label.setPixmap(self.pic)
