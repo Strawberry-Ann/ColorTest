@@ -60,7 +60,6 @@ class MyColor:
 
     def opposite(self):
         colors = [self.hsv2rgb((self.h + 180 * i) % 360, self.s, self.v) for i in range(2)]
-        print(colors)
         return colors
 
     def square(self):

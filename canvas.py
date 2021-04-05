@@ -63,11 +63,23 @@ class MyWidget(QMainWindow):
         self.widget_results.resize(782, 760)
         self.widget_results.move(9, 9)
         self.rec_or_rez = QComboBox(self.widget_results)
-        self.rec_or_rez.resize(140, 30)
-        self.rec_or_rez.move(321, 20)
-        self.rec_or_rez.addItem('Результаты')
-        self.rec_or_rez.addItem('Рекомендации')
+        self.rec_or_rez.resize(400, 30)
+        self.rec_or_rez.move(191, 20)
+        self.rec_or_rez.addItems(['Результаты', 'Рекомендации'])
+        self.rec_or_rez.activated.connect(self.look_result)
+        self.rooms = QComboBox(self.widget_results)
+        self.rooms.resize(400, 30)
+        self.rooms.move(191, 60)
+        self.rooms.addItems(['Ванная комната', 'Гостиная', 'Кухня', 'Спальня'])
+        self.rooms.activated.connect(self.look_result)
         self.result = QLabel(self.widget_results)
+        self.result.move(141, 100)
+        self.result.resize(500, 600)
+        self.but_menu = QPushButton(self.widget_results)
+        self.but_menu.move(21, 20)
+        self.but_menu.resize(100, 70)
+        self.but_menu.setText('<- В меню')
+        self.but_menu.clicked.connect(self.show_menu)
         self.widget_results.hide()
 
     def copy_files(self):
@@ -113,6 +125,7 @@ class MyWidget(QMainWindow):
     def show_menu(self):
         # перейти в меню
         self.widget.hide()
+        self.widget_results.hide()
         self.widget_menu.show()
 
     def end_fill(self):
@@ -131,18 +144,22 @@ class MyWidget(QMainWindow):
         colors = self.analize_pictures()
         for name, color in colors:
             width, height = 500, 600
-            im = Image.new("RGB", (width, height), (9, 27, 96))
+            im = Image.new("RGB", (width, height), (0, 0, 0))
             combo = color.get_comb()
             draw = ImageDraw.Draw(im)
             for i in range(len(combo)):
                 for j in range(len(combo[i])):
                     color_my = combo[i][j]
                     draw.rectangle(((100 * j, 100 * i), (100 * (j + 1), 100 * (i + 1))), color_my)
-            im.save(f'results/{name}.bmp')
+            im.save(f'Результаты/{name}.bmp')
         self.widget_results.show()
 
-
-        # self.show_menu()
+    def look_result(self):
+        name_dr = self.rec_or_rez.currentText()
+        name_file = self.rooms.currentText()
+        self.pic = QPixmap(f'{name_dr}/{name_file}.bmp')
+        self.pic = self.pic.scaled(500, 600, 1)
+        self.result.setPixmap(self.pic)
 
     def analize_pictures(self):
         colors = list()
