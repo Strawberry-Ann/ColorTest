@@ -1,7 +1,7 @@
 from PIL import Image
 from PyQt5 import uic  # Импортируем uic
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
-from PyQt5.QtWidgets import QMessageBox, QInputDialog, QButtonGroup
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget
+from PyQt5.QtWidgets import QMessageBox, QInputDialog, QButtonGroup, QComboBox, QLabel
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 import sys
@@ -27,35 +27,48 @@ class MyWidget(QMainWindow):
     def initUI(self):
         self.bg.buttonClicked.connect(self.check_color)
         self.widget.hide()
+        # виджет меню
+        self.widget_menu = QWidget(self)
+        self.widget_menu.resize(782, 760)
+        self.widget_menu.move(9, 9)
         # кнопка начала раскрашивания картинки
-        self.pb_start = QPushButton(self)
+        self.pb_start = QPushButton(self.widget_menu)
         self.pb_start.move(100, 0)
-        self.pb_start.setMinimumSize(200, 800)
+        self.pb_start.setMinimumSize(200, 760)
         self.pb_start.setText("Начать подборку цветов")
         self.pb_start.clicked.connect(self.run_picture)
         # кнопка для показа теории
-        self.teory = QPushButton(self)
+        self.teory = QPushButton(self.widget_menu)
         self.teory.move(300, 0)
-        self.teory.setMinimumSize(200, 800)
+        self.teory.setMinimumSize(200, 760)
         self.teory.setText("Start teory")
         self.teory.clicked.connect(self.run_teory)
         # кнопка показа результата
-        self.results = QPushButton(self)
+        self.results = QPushButton(self.widget_menu)
         self.results.move(500, 0)
-        self.results.setMinimumSize(200, 800)
+        self.results.setMinimumSize(200, 760)
         self.results.setText("Get Result")
-
         # группа кнопок меню
-        self.group_buts_menu = QButtonGroup(self)
+        self.group_buts_menu = QButtonGroup(self.widget_menu)
         self.group_buts_menu.addButton(self.pb_start)
         self.group_buts_menu.addButton(self.teory)
         self.group_buts_menu.addButton(self.results)
         self.results.clicked.connect(self.run_results)
-
         # кнопки на виджете
         self.pb_to_begin.clicked.connect(self.to_begin)
         self.pb_end_fill.clicked.connect(self.end_fill)
         self.pb_check_picture.clicked.connect(self.check_picture)
+        # виджет результатов
+        self.widget_results = QWidget(self)
+        self.widget_results.resize(782, 760)
+        self.widget_results.move(9, 9)
+        self.rec_or_rez = QComboBox(self.widget_results)
+        self.rec_or_rez.resize(140, 30)
+        self.rec_or_rez.move(321, 20)
+        self.rec_or_rez.addItem('Результаты')
+        self.rec_or_rez.addItem('Рекомендации')
+        self.result = QLabel(self.widget_results)
+        self.widget_results.hide()
 
     def copy_files(self):
         # функция копирования изображений из папки data в папку user
@@ -69,10 +82,10 @@ class MyWidget(QMainWindow):
 
     def run_picture(self):
         # функция показа окна заливки изображения
-        for button in self.group_buts_menu.buttons():
-            button.hide()
+        self.widget_menu.hide()
         self.check_picture()
         self.widget.show()
+        self.paint = True
 
     def check_picture(self):
         # сменить картинку для закрашивания
@@ -83,8 +96,7 @@ class MyWidget(QMainWindow):
 
     def run_teory(self):
         # функция показа теории
-        for button in self.group_buts_menu.buttons():
-            button.hide()
+        self.widget_menu.hide()
         self.widget.show()
 
     def to_begin(self):
@@ -101,8 +113,7 @@ class MyWidget(QMainWindow):
     def show_menu(self):
         # перейти в меню
         self.widget.hide()
-        for button in self.group_buts_menu.buttons():
-            button.show()
+        self.widget_menu.show()
 
     def end_fill(self):
         # функция окончания заливки и показа результатов
@@ -112,22 +123,26 @@ class MyWidget(QMainWindow):
 
     def run_results(self):
         # !!!!!!!!!!!!!!!!!!!!!!!#
-        for button in self.group_buts_menu.buttons():
-            button.hide()
+        # проверяем, видны ли эти виджеты, если да, то прячем
+        # if not self.widget_menu.visibleRegion().isEmpty():
+        self.widget_menu.hide()
+        # if not self.widget.visibleRegion().isEmpty():
+        self.widget.hide()
         colors = self.analize_pictures()
         for name, color in colors:
-            print(name)
-            im = Image.new("RGB", (500, 600), (9, 27, 96))
-            width, height = im.width, im.height
+            width, height = 500, 600
+            im = Image.new("RGB", (width, height), (9, 27, 96))
             combo = color.get_comb()
-            print(combo)
             draw = ImageDraw.Draw(im)
             for i in range(len(combo)):
                 for j in range(len(combo[i])):
                     color_my = combo[i][j]
-                    draw.rectangle(((100 * j, 100 * i), (100, 100)), color_my)
+                    draw.rectangle(((100 * j, 100 * i), (100 * (j + 1), 100 * (i + 1))), color_my)
             im.save(f'results/{name}.bmp')
-        self.show_menu()
+        self.widget_results.show()
+
+
+        # self.show_menu()
 
     def analize_pictures(self):
         colors = list()

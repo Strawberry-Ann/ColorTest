@@ -8,7 +8,7 @@ class MyColor:
         self.h, self.s, self.v, = self.rgb2hsv(r, g, b)
 
     def get_comb(self):
-        return [self.opposite(), self.opposite_analogy(), self.triada(), self.square(), self.tetrada(), self.analogy()]
+        return [self.opposite(), self.analogy(), self.opposite_analogy(), self.square(), self.tetrada(), self.triada()]
 
     def rgb2hsv(self, r, g, b):
         r, g, b = r / 255, g / 255, b / 255
@@ -72,7 +72,7 @@ class MyColor:
         return colors
 
     def opposite_analogy(self):
-        colors = [self.hsv2rgb((self.h + 60 * i) % 360, self.s, self.v) for i in [-1, 0, 1]]
+        colors = [self.hsv2rgb((self.h + 60 * i) % 360, self.s, self.v) for i in [0, -1, 1]]
         return colors
 
     def tetrada(self):
