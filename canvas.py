@@ -1,6 +1,6 @@
 from PIL import Image
 from PyQt5 import uic  # Импортируем uic
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QTextEdit
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QButtonGroup, QComboBox, QLabel
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
@@ -81,6 +81,22 @@ class MyWidget(QMainWindow):
         self.but_menu.setText('<- В меню')
         self.but_menu.clicked.connect(self.show_menu)
         self.widget_results.hide()
+        # виджет теории
+        self.widget_teory = QWidget(self)
+        self.widget_teory.resize(782, 760)
+        self.widget_teory.move(9, 9)
+        self.widget_teory.hide()
+        self.but_from_teory_to_menu = QPushButton(self.widget_teory)
+        self.but_from_teory_to_menu.move(21, 20)
+        self.but_from_teory_to_menu.resize(100, 70)
+        self.but_from_teory_to_menu.setText('<- В меню')
+        self.but_from_teory_to_menu.clicked.connect(self.show_menu)
+        self.teory = QTextEdit(self.widget_teory)
+        self.teory.setReadOnly(True)
+        self.teory.move(41, 100)
+        self.teory.resize(700, 600)
+        self.file = open("Теория/teory.txt", "r").read()
+        self.teory.setText(self.file)
 
     def copy_files(self):
         # функция копирования изображений из папки data в папку user
@@ -109,7 +125,7 @@ class MyWidget(QMainWindow):
     def run_teory(self):
         # функция показа теории
         self.widget_menu.hide()
-        self.widget.show()
+        self.widget_teory.show()
 
     def to_begin(self):
         # начать закрашивать изображение сначала
@@ -125,6 +141,7 @@ class MyWidget(QMainWindow):
     def show_menu(self):
         # перейти в меню
         self.widget.hide()
+        self.widget_teory.hide()
         self.widget_results.hide()
         self.widget_menu.show()
 
